@@ -1,0 +1,70 @@
+Pseudo code for loss
+--------------------------------------------------------------------------------
+Input: stream schedules - streams
+       current stream - I
+       current streams length - J
+       packet to be padded - packet
+
+Output: Throughput loss in the form of SNR * length
+--------------------------------------------------------------------------------
+%break_point_list[I - 1] - points where stream change packets
+%affected_packet_list[I - 1] - index of packet to be affect by packet
+
+begin_time <- J - packet.length
+end_time <- J
+
+%find the first packet to be affect for all streams
+for i = 2 : i - 1
+  packet_index <- 1
+  while true
+    if streams[i].schedule[packet_index] > begin_time
+      break_point_list[i] <- streams[i].schedule[packet_index]
+      affected_packet_list[i] <- streams[i].packet[packet_index] - 0.5
+      break
+    end if
+    if streams[i].schedule[packet_index] + streams[i].packets[packet_index].length > begin_time
+      break_point_list[i] <- streams[i].schedule[packet_index] + streams[i].packets[packet_index].length
+      affected_packet_list[i] <- streams[i].packet[packet_index]
+      break
+    end if
+    !!!如果加到头了还没到begin_time怎么办 —— 做判断
+    packet_index++
+  end while
+end for
+
+loss_sum = 0
+current_timing = begin_time
+
+while true
+  i <- argmin(break_point_list[i])
+  if break_point_list[i] < end_time
+    break_point <- break_point_list[i]
+  else
+    break_point <- end_time
+  end if
+  loss_list <- {}
+  for j = 1 : I - 1
+    if affected_packet_list[j] is integer
+      !!!loss_list.add(streams[j].packets[affected_packet_list[j]])
+    end if
+  end for
+  loss_sum += loss_SNR(loss_list) * (break_point - current_timing)
+  current_timing <- break_point
+  if current_timing = end_time
+    break
+  end if
+  current_packet <- affected_packet_list[i]
+  if current_packet is integer
+    break_point_list[i] <- where current_packet ends
+    if the next packet starts immediately after current_packet ends
+      affected_packet_list[i] <- current_packet + 1
+    else
+      affected_packet_list[i] <- current_packet + 0.5
+    end if
+  else
+    break_point_list[i] <- beginning of the next packet
+    affected_packet_list[i] <- current_packet + 0.5
+  end if
+end while
+
+output loss_sum

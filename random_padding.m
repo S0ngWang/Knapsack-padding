@@ -17,7 +17,6 @@ for n = 2: numel(pkt)
 end
 
 master_length = pkt(longest_pkt_index).length;
-master_length
 used_pkt = [used_pkt longest_pkt_index];
 
 

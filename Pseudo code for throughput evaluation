@@ -1,0 +1,44 @@
+Pseudo code for throughput evaluation
+--------------------------------------------------------------------------------
+Input: stream schedules - streams
+       antenna number - M
+       packet number - k
+--------------------------------------------------------------------------------
+%break_point_list[M - 1] - points where stream change packets
+%affected_packet_list[M - 1] - current packets in every stream
+
+break_point_list <- ones(1, M - 1)
+for i = 1 : M - 1
+  if streams[i].schedule[1] = 0
+    break_point_list[i] <- streams[i].packets[1].length
+    affected_packet_list[i] <- 1
+  else
+    break_point_list[i] <- streams[i].schedule[1]
+    affected_packet_list[i] <- 0.5
+  end if
+end for
+
+throughput_sum <- 0
+current_timing <- 0
+
+do
+  i <- argmin(break_point_list[i])
+  break_point <- break_point_list[i]
+  throughput_list <- {}
+  for j = 1 : M - 1
+    if affected_packet_list[j] is integer
+      throughput_list.add(streams[j].packets[affected_packet_list[j]])
+    end if
+  end for
+  throughput_sum += throughput_SNR(throughput_list) * (break_point - current_timing)
+  current_timing <- end_time
+  current_packet <- affected_packet_list[i]
+  if current_packet is integer
+    if the next packet starts immediately after current_packet ends
+      break_point_list[i] <- the end of the next packet
+      affected_packet_list[i] <- current_packet + 1
+    else
+      break_point_list[i] <- the begin of the next packet
+      affected_packet_list[i] <- current_packet + 0.5
+    end if
+while affected_packet_list[i] = streams[i].packets[max] for all M streams

@@ -31,6 +31,7 @@ H = normalized_power.*CSI(total_list,:);
 H = H.';%inverse of matrix
 SNR_total_list = diag ( 1./inv(H'*H + eye(size(H,2)) ) - 1 );
 
+%SNR_total_sum = sum(log2(1 + SNR_total_list));
 SNR_total_sum = sum(SNR_total_list);
 
 loss_sum = SNR_con_sum + SNR_alone - SNR_total_sum;

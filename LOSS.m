@@ -18,7 +18,7 @@ affected_packet_list(1) = streams(1, master_length).selected_pkt(1);
 for i = 2 : I - 1
     packet_index = 1;
     while 1
-      if streams(i, master_length).schedule(packet_index) > begin_time
+      if streams(i, master_length).schedule(packet_index) > begin_time %END_PKT_NUMBER
         break_point_list(i) = streams(i, master_length).schedule(packet_index);
         affected_packet_list(i) = packet_index;
         break;

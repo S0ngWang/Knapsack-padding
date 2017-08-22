@@ -10,6 +10,7 @@ function [throughput_sum] = eval_throughput(M)
 global streams;
 global master_length;
 global pkt;
+global jind;
 
 %break_point_list = ones(1, M - 1);
 break_point_list = [];
@@ -19,7 +20,7 @@ break_point_list(1) = master_length;
 affected_packet_list(1) = streams(1, master_length).selected_pkt(1);
 
 for i = 2 : M
-  if isempty(streams(i, master_length).selected_pkt)
+  if isempty(streams(i, master_length).selected_pkt) %pkt # = 5, Index exceeds matrix dimensions.
       break;
   else
       if streams(i, master_length).schedule(1) == 0
@@ -42,8 +43,11 @@ while 1
   break_point = break_point_list(i);
   throughput_list = streams(1, master_length).selected_pkt(1);
   for j = 2 : M
-      if mod(affected_packet_list(j),1) == 0
-          throughput_list = [throughput_list streams(j, master_length).selected_pkt(affected_packet_list(j))];
+      if isempty(affected_packet_list) ~= 1
+          jind = j;
+          if mod(affected_packet_list(j),1) == 0 %pkt # = 10, Index exceeds matrix dimensions.
+              throughput_list = [throughput_list streams(j, master_length).selected_pkt(affected_packet_list(j))];
+          end
       end
   end
   throughput_sum = throughput_sum + throughput_SNR(throughput_list) * (break_point - current_timing);

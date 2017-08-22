@@ -19,7 +19,6 @@ for n = 2: numel(pkt)
 end
 
 master_length = pkt(longest_pkt_index).length;
-master_length
 used_pkt = [used_pkt longest_pkt_index];
 
 
@@ -30,7 +29,6 @@ streams(1, master_length).max_value = pkt(longest_pkt_index).value;
 streams(1, master_length).schedule = 0;
 
 for i = 2: M
-  i
   for j = 2: master_length
       streams(i,j).max_value = 0;
       streams(i,j).selected_pkt = [];
